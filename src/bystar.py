@@ -28,8 +28,10 @@ class Bystar:
     # Permutation
     c_key = self.permutate(bit_rep, copy_table)
 
-    # Split key to four parts
+    # Convert to list[int] to execute XOR operation
     c_key = bits_to_int(c_key)
+
+    # Split key to four parts
     quarter = [c_key[i:i+4] for i in range(0, len(c_key), 4)]
 
     # XOR 1st ^ 3rd and 2nd ^ 4th
@@ -39,7 +41,7 @@ class Bystar:
     # Shift left the first half
     # Shift right the last half
     # by current iteration modulo total iteration
-    c_key = shift_right(first_half, iter % ITERATION) + shift_left(last_half, iter % ITERATION)
+    c_key = shift_left(first_half, iter % ITERATION) + shift_right(last_half, iter % ITERATION)
 
     return int_to_bits(c_key)
     
@@ -106,7 +108,7 @@ class Bystar:
   
 
   def rotation(self, arr_int: list[int], key: list[int], iter: int) -> list[int]:
-    # Convert to bit rep to shift permutation
+    # Convert to bit rep to execute shift operation
     c_text = int_to_bits(arr_int)
 
     # Split current bit rep
@@ -118,7 +120,7 @@ class Bystar:
     # by current iteration modulo length of left/right
     c_text = shift_left(left, iter % length) + shift_right(right, iter % length)
 
-    # Convert to list[int] to execute XOR operation & Subtitution
+    # Convert to list[int] to execute XOR operation & subtitution
     c_text = bits_to_int(c_text)
 
     # XOR operation between c_text and key
@@ -126,7 +128,7 @@ class Bystar:
     # Subtitution
     c_text = [S_BOX[num] for num in c_text]
 
-    # Convert to bit rep to shift permutation
+    # Convert to bit rep to execute shift operation
     c_text = int_to_bits(c_text)
 
     # Split current bit rep
