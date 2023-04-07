@@ -88,6 +88,38 @@ class CBC(OperationMode):
     return result
 # endregion CBC Mode
 
+# region Counter Mode
+class Counter(OperationMode):
+  def __init__(self, key: str) -> None:
+    super().__init__(key)
+    self.format = '{:0' + str(BLOCK_SIZE) + 'b}'
+    self.counter = 0
+
+  def generate_counter(self, size: int) -> list[int]:
+    random.seed(size)
+    self.counter = [int(bit) for bit in f'{self.format}'.format(random.randint(0, 2**size - 1))]
+
+  def increment_counter(self, c_counter: list[int]) -> list[int]:
+    num = int('0b' + ''.join(map(str, c_counter)), 2)
+    num = (num + 1) % (2**BLOCK_SIZE - 1)
+    return [int(bit) for bit in f'{self.format}'.format(num)]
+  
+  def encrypt(self, plain_text: str) -> str:
+    self.generate_counter(BLOCK_SIZE)
+
+    result = ""
+    for block in super().execute_per_block(plain_text):
+      c_encrypted = string_to_bits(
+        self.bystar.encrypt(self.counter, self.internal_key)
+      )
+      result += bits_to_string([c_encrypted[i] ^ block[i] for i in range(BLOCK_SIZE)])
+      self.counter = self.increment_counter(self.counter)
+
+    return result
+  
+  def decrypt(self, cipher_text: str) -> str:
+    return self.encrypt(cipher_text)
+# endregion Counter Mode
 
 # Testing ECB Mode
 '''
@@ -101,6 +133,15 @@ print(decrypted)
 # Testing CBC Mode
 '''
 cipher = CBC(KEY)
+encrypted = cipher.encrypt(PLAIN_TEXT)
+print(encrypted)
+decrypted = cipher.decrypt(encrypted)
+print(decrypted)
+'''
+
+# Testing Counter Mode
+'''
+cipher = Counter(KEY)
 encrypted = cipher.encrypt(PLAIN_TEXT)
 print(encrypted)
 decrypted = cipher.decrypt(encrypted)
