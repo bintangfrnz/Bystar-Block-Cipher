@@ -3,7 +3,9 @@
 
 # March 5, 2023
 
+import random
 from abc import ABC, abstractmethod
+
 from bystar import Bystar
 from constant import BLOCK_SIZE, KEY, PLAIN_TEXT
 from utils import string_to_bits, bits_to_string
@@ -36,7 +38,6 @@ class OperationMode(ABC):
 
 # region ECB Mode
 class ECB(OperationMode):
-
   def encrypt(self, plain_text: str) -> str:
     result = ""
     for block in super().execute_per_block(plain_text):
@@ -52,10 +53,54 @@ class ECB(OperationMode):
     return result
 # endregion ECB Mode
 
+# region CBC Mode
+class CBC(OperationMode):
+  def __init__(self, key: str) -> None:
+    super().__init__(key)
+    self.c_val = self.generate_iv(BLOCK_SIZE)
+
+  def generate_iv(self, size: int) -> list[int]:
+    return [random.randint(0, 1) for _ in range(size)]
+  
+  def encrypt(self, plain_text: str) -> str:
+    result = bits_to_string(self.c_val)
+    for block in super().execute_per_block(plain_text):
+      self.c_val = string_to_bits(
+        self.bystar.encrypt([self.c_val[i] ^ block[i] for i in range(BLOCK_SIZE)], self.internal_key)
+      )
+      result += bits_to_string(self.c_val)
+
+    return result
+  
+  def decrypt(self, cipher_text: str) -> str:
+    result = ""
+    first = True
+    for block in super().execute_per_block(cipher_text):
+      if first:
+        self.c_val = block
+        first = False
+        continue
+
+      c_decrypted = string_to_bits(self.bystar.decrypt(block, self.internal_key))
+      result += bits_to_string([self.c_val[i] ^ c_decrypted[i] for i in range(BLOCK_SIZE)])
+      self.c_val = block
+
+    return result
+# endregion CBC Mode
+
 
 # Testing ECB Mode
 '''
 cipher = ECB(KEY)
+encrypted = cipher.encrypt(PLAIN_TEXT)
+print(encrypted)
+decrypted = cipher.decrypt(encrypted)
+print(decrypted)
+'''
+
+# Testing CBC Mode
+'''
+cipher = CBC(KEY)
 encrypted = cipher.encrypt(PLAIN_TEXT)
 print(encrypted)
 decrypted = cipher.decrypt(encrypted)
