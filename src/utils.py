@@ -43,6 +43,14 @@ def bits_to_int(bit_rep: list[int]) -> list[int]:
   )
 # endregion
 
+# region shift operation
+def shift_left(arr: list[int], distance: int) -> list[int]:
+  return arr[distance:] + arr[:distance]
+
+def shift_right(arr: list[int], distance: int) -> list[int]:
+  return arr[-distance:] + arr[:-distance]
+# endregion
+
 
 # Testing char <-> bit
 '''
