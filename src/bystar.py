@@ -9,6 +9,7 @@ from constant import *
 from utils import *
 
 class Bystar:
+
   def format_key(self, bits: list[int]):
     if len(bits) == BLOCK_SIZE:
       return bits
@@ -17,6 +18,7 @@ class Bystar:
     else:
       return bits[:BLOCK_SIZE]
     
+
   def generate_different_keys(self, bit_rep: list[int], iter: int) -> list[int]:
     # Generate new permutation table
     copy_table = PERMUTATION_TABLE.copy()
@@ -41,64 +43,115 @@ class Bystar:
 
     return int_to_bits(c_key)
     
+
   def generate_internal_key(self, key: str) -> list:
     bit_rep = self.format_key(string_to_bits(key))
     return [self.generate_different_keys(bit_rep, idx) for idx in range(ITERATION)]
   
+
   def encrypt(self, bit_rep: list[int], internal_keys: list[list[int]]) -> str:
     # Permutation
-    c_list = self.permutate(bit_rep, IP_MATRIX)
+    c_cipher = self.permutate(bit_rep, IP_MATRIX)
 
-    # Convert bit rep to list[int]
-    c_list = bits_to_int(c_list)
+    # Convert to list[int] to execute XOR operation
+    c_cipher = bits_to_int(c_cipher)
 
-    # Split current bit rep
-    left, right = c_list[: len(c_list) // 2], c_list[len(c_list) // 2:]
+    # Split current list[int]
+    left, right = c_cipher[: len(c_cipher) // 2], c_cipher[len(c_cipher) // 2:]
 
     # Feitsel Network
-    for idx in range(ITERATION - 1, -1, -1):
-      # rotation
-      pass
+    for idx in range(ITERATION)[::-1]:
+      c_left = left.copy()
+      temp = self.rotation(left, internal_keys[idx], idx)
 
-    # Convert list[int] to bit rep
-    c_list = int_to_bits(left + right)
+      # XOR operation between right and rotation func result
+      left = [temp[i] ^ right[i] for i in range(len(right))]
+      right = c_left
+
+    # Convert to bit rep to execute permutation
+    c_cipher = int_to_bits(left + right)
 
     # Permutation
-    c_list = self.permutate(c_list, INVERSE_IP_MATRIX)
+    c_cipher = self.permutate(c_cipher, INVERSE_IP_MATRIX)
 
-    return c_list
+    return bits_to_string(c_cipher)
   
+
   def decrypt(self, bit_rep: list[int], internal_keys: list[list[int]]) -> str:
     # Permutation
-    c_list = self.permutate(bit_rep, IP_MATRIX)
+    c_plain = self.permutate(bit_rep, IP_MATRIX)
 
-    # Convert bit rep to list[int]
-    c_list = bits_to_int(c_list)
+    # Convert to list[int] to execute XOR operation
+    c_plain = bits_to_int(c_plain)
 
-    # Split current bit rep
-    left, right = c_list[: len(c_list) // 2], c_list[len(c_list) // 2:]
+    # Split current list[int]
+    left, right = c_plain[:len(c_plain) // 2], c_plain[len(c_plain) // 2:]
 
     # Feitsel Network
-    for idx in range(ITERATION - 1, -1, -1):
-      # rotation
-      pass
+    for idx in range(ITERATION):
+      c_right = right.copy()
+      temp = self.rotation(right, internal_keys[idx], idx)
 
-    # Convert list[int] to bit rep
-    c_list = int_to_bits(left + right)
+      # XOR operation between left and rotation func result
+      right = [temp[i] ^ left[i] for i in range(len(left))]
+      left = c_right
+
+    # Convert to bit rep to execute permutation
+    c_plain = int_to_bits(left + right)
 
     # Permutation
-    c_list = self.permutate(c_list, INVERSE_IP_MATRIX)
+    c_plain = self.permutate(c_plain, INVERSE_IP_MATRIX)
 
-    return c_list
+    return bits_to_string(c_plain)
   
-  def rotation(self):
-    return
+
+  def rotation(self, arr_int: list[int], key: list[int], iter: int) -> list[int]:
+    # Convert to bit rep to shift permutation
+    c_text = int_to_bits(arr_int)
+
+    # Split current bit rep
+    length = len(c_text) // 2
+    left, right = c_text[:length], c_text[length:]
+
+    # Shift left the left side
+    # Shift right the right side
+    # by current iteration modulo length of left/right
+    c_text = shift_left(left, iter % length) + shift_right(right, iter % length)
+
+    # Convert to list[int] to execute XOR operation & Subtitution
+    c_text = bits_to_int(c_text)
+
+    # XOR operation between c_text and key
+    c_text = [key[i] ^ c_text[i] for i in range(len(c_text))]
+    # Subtitution
+    c_text = [S_BOX[num] for num in c_text]
+
+    # Convert to bit rep to shift permutation
+    c_text = int_to_bits(c_text)
+
+    # Split current bit rep
+    length = len(c_text) // 2
+    left, right = c_text[:length], c_text[length:]
+
+    # Shift left the right side
+    # Shift right the left side
+    # by current iteration modulo length of left/right
+    c_text = shift_left(right, iter % length) + shift_right(left, iter % length)
+
+    return bits_to_int(c_text)
   
+
   def permutate(self, bit_rep: list[int], table: list[int]) -> list[int]:
     result = [0] * BLOCK_SIZE
     for idx, bit in enumerate(bit_rep):
       result[table[idx] - 1] = bit
     return result
 
-# cipher = Bystar()
-# cipher.encrypt(string_to_bits("abcdefghijklmnop"), cipher.generate_internal_key(KEY))
+# Testing Bystar Block Cipher
+'''
+cipher = Bystar()
+encrypted = cipher.encrypt(string_to_bits("abcdefghijklmnop"), cipher.generate_internal_key(KEY))
+print(encrypted)
+decrypted = cipher.decrypt(string_to_bits(encrypted), cipher.generate_internal_key(KEY))
+print(decrypted)
+'''
