@@ -36,7 +36,7 @@ class Bystar:
 
     # Shift left the first half
     # Shift right the last half
-    # by current iteration mod total iteration
+    # by current iteration modulo total iteration
     c_key = shift_right(first_half, iter % ITERATION) + shift_left(last_half, iter % ITERATION)
 
     return int_to_bits(c_key)
@@ -45,11 +45,51 @@ class Bystar:
     bit_rep = self.format_key(string_to_bits(key))
     return [self.generate_different_keys(bit_rep, idx) for idx in range(ITERATION)]
   
-  def encrypt(self):
-    return
+  def encrypt(self, bit_rep: list[int], internal_keys: list[list[int]]) -> str:
+    # Permutation
+    c_list = self.permutate(bit_rep, IP_MATRIX)
+
+    # Convert bit rep to list[int]
+    c_list = bits_to_int(c_list)
+
+    # Split current bit rep
+    left, right = c_list[: len(c_list) // 2], c_list[len(c_list) // 2:]
+
+    # Feitsel Network
+    for idx in range(ITERATION - 1, -1, -1):
+      # rotation
+      pass
+
+    # Convert list[int] to bit rep
+    c_list = int_to_bits(left + right)
+
+    # Permutation
+    c_list = self.permutate(c_list, INVERSE_IP_MATRIX)
+
+    return c_list
   
-  def decrypt(self):
-    return
+  def decrypt(self, bit_rep: list[int], internal_keys: list[list[int]]) -> str:
+    # Permutation
+    c_list = self.permutate(bit_rep, IP_MATRIX)
+
+    # Convert bit rep to list[int]
+    c_list = bits_to_int(c_list)
+
+    # Split current bit rep
+    left, right = c_list[: len(c_list) // 2], c_list[len(c_list) // 2:]
+
+    # Feitsel Network
+    for idx in range(ITERATION - 1, -1, -1):
+      # rotation
+      pass
+
+    # Convert list[int] to bit rep
+    c_list = int_to_bits(left + right)
+
+    # Permutation
+    c_list = self.permutate(c_list, INVERSE_IP_MATRIX)
+
+    return c_list
   
   def rotation(self):
     return
@@ -59,3 +99,6 @@ class Bystar:
     for idx, bit in enumerate(bit_rep):
       result[table[idx] - 1] = bit
     return result
+
+# cipher = Bystar()
+# cipher.encrypt(string_to_bits("abcdefghijklmnop"), cipher.generate_internal_key(KEY))
