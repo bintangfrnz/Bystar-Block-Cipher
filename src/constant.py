@@ -6,6 +6,9 @@
 ITERATION = 16 # round
 BLOCK_SIZE = 128 # bits
 
+TEST_DIRECTORY = "test"
+RESULT_DIRECTORY = "result"
+
 PLAIN_TEXT = "This Bystar cipher created by Bintang NIM (13519138) on March 5." # 64 bytes (4 blocks)
 KEY = "Bystar138Cipherz" # 16 bytes
 

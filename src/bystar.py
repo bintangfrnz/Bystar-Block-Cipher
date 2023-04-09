@@ -5,8 +5,9 @@
 
 import random
 
-from constant import *
-from utils import *
+from .constant import *
+from .utils import *
+# remove dot to run this file
 
 class Bystar:
 

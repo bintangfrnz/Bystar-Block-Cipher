@@ -6,9 +6,10 @@
 import random
 from abc import ABC, abstractmethod
 
-from bystar import Bystar
-from constant import BLOCK_SIZE, KEY, PLAIN_TEXT
-from utils import string_to_bits, bits_to_string
+from .bystar import Bystar
+from .constant import BLOCK_SIZE, KEY, PLAIN_TEXT
+from .utils import string_to_bits, bits_to_string
+# remove dot to run this file
 
 # region OperationMode
 class OperationMode(ABC):
