@@ -25,67 +25,35 @@ for file in list_files:
   filename = file.split('/')[1]
   for mode in OperationMode:
     if mode.name == "ECB":
-      all_result += f"Mode: {mode.name}\n"
       cipher = op.ECB(KEY)
-
-      # encryption
-      start_timer = time.time()
-      encrypted = cipher.encrypt(data)
-      end_timer = time.time()
-      encrypt_time = end_timer - start_timer
-      all_result += f"  - Encryption time: {encrypt_time} second\n"
-
-      # Save Encrypted Result
-      result_file = os.path.join(RESULT_DIRECTORY, f"encrypted_{filename}")
-      save_file(result_file, encrypted)
-
-      # decryption
-      start_timer = time.time()
-      decrypted = cipher.decrypt(encrypted)
-      end_timer = time.time()
-      decrypt_time = end_timer - start_timer
-      all_result += f"  - Decryption time: {decrypt_time} second\n"
-
-      # Save Decrypted Result
-      result_file = os.path.join(RESULT_DIRECTORY, f"decrypted_{filename}")
-      save_file(result_file, decrypted)
-
     elif mode.name == "CBC":
-      all_result += f"Mode: {mode.name}\n"
       cipher = op.CBC(KEY)
-
-      # encryption
-      start_timer = time.time()
-      encrypted = cipher.encrypt(data)
-      end_timer = time.time()
-      encrypt_time = end_timer - start_timer
-      all_result += f"  - Encryption time: {encrypt_time} second\n"
-
-
-      # decryption
-      start_timer = time.time()
-      decrypted = cipher.decrypt(encrypted)
-      end_timer = time.time()
-      decrypt_time = end_timer - start_timer
-      all_result += f"  - Decryption time: {decrypt_time} second\n"
-
-    elif mode.name == "Counter":
-      all_result += f"Mode: {mode.name}\n"
+    else:
       cipher = op.Counter(KEY)
+    
+    all_result += f"Mode: {mode.value}\n"
 
-      # encryption
-      start_timer = time.time()
-      encrypted = cipher.encrypt(data)
-      end_timer = time.time()
-      encrypt_time = end_timer - start_timer
-      all_result += f"  - Encryption time: {encrypt_time} second\n"
+    # encryption
+    start_timer = time.time()
+    encrypted = cipher.encrypt(plain_text=data, toHex=True)
+    end_timer = time.time()
+    encrypt_time = end_timer - start_timer
+    all_result += f"  - Encryption time: {encrypt_time} second\n"
 
-      # decryption
-      start_timer = time.time()
-      decrypted = cipher.decrypt(encrypted)
-      end_timer = time.time()
-      decrypt_time = end_timer - start_timer
-      all_result += f"  - Decryption time: {decrypt_time} second\n"
+    # Save Encrypted Result
+    result_file = os.path.join(RESULT_DIRECTORY, f"encrypted_{filename}")
+    save_file(result_file, encrypted)
+
+    # decryption
+    start_timer = time.time()
+    decrypted = cipher.decrypt(cipher_text=encrypted, fromHex=True)
+    end_timer = time.time()
+    decrypt_time = end_timer - start_timer
+    all_result += f"  - Decryption time: {decrypt_time} second\n"
+
+    # Save Decrypted Result
+    result_file = os.path.join(RESULT_DIRECTORY, f"decrypted_{filename}")
+    save_file(result_file, decrypted)
   
   all_result += "\n----------\n"
 

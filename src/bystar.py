@@ -52,7 +52,7 @@ class Bystar:
     return [self.generate_different_keys(bit_rep, idx) for idx in range(ITERATION)]
   
 
-  def encrypt(self, bit_rep: list[int], internal_keys: list[list[int]]) -> str:
+  def encrypt(self, bit_rep: list[int], internal_keys: list[list[int]], toHex: bool = False) -> str:
     # Permutation
     c_cipher = self.permutate(bit_rep, IP_MATRIX)
 
@@ -77,7 +77,9 @@ class Bystar:
     # Permutation
     c_cipher = self.permutate(c_cipher, INVERSE_IP_MATRIX)
 
-    return bits_to_string(c_cipher)
+    encrypted = bits_to_string(c_cipher)
+
+    return string_to_hex(encrypted) if toHex else encrypted
   
 
   def decrypt(self, bit_rep: list[int], internal_keys: list[list[int]]) -> str:

@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 from .bystar import Bystar
 from .constant import BLOCK_SIZE, KEY, PLAIN_TEXT
-from .utils import string_to_bits, bits_to_string
+from .utils import string_to_bits, bits_to_string, string_to_hex, hex_to_string
 # remove dot to run this file
 
 # region OperationMode
@@ -28,25 +28,27 @@ class OperationMode(ABC):
       yield block
   
   @abstractmethod
-  def encrypt(self, text: str) -> str:
+  def encrypt(self, text: str, toHex: bool = False) -> str:
     pass
 
   @abstractmethod
-  def decrypt(self, text: str) -> str:
+  def decrypt(self, text: str, fromHex: bool = False) -> str:
     pass
 # endregion OperationMode
 
 
 # region ECB Mode
 class ECB(OperationMode):
-  def encrypt(self, plain_text: str) -> str:
+  def encrypt(self, plain_text: str, toHex: bool = False) -> str:
     result = ""
     for block in super().execute_per_block(plain_text):
-      result += self.bystar.encrypt(block, self.internal_key)
+      result += self.bystar.encrypt(block, self.internal_key, toHex)
 
     return result
   
-  def decrypt(self, cipher_text: str) -> str:
+  def decrypt(self, cipher_text: str, fromHex: bool = False) -> str:
+    cipher_text = hex_to_string(cipher_text) if (fromHex) else cipher_text
+
     result = ""
     for block in super().execute_per_block(cipher_text):
       result += self.bystar.decrypt(block, self.internal_key)
@@ -63,7 +65,7 @@ class CBC(OperationMode):
   def generate_iv(self, size: int) -> list[int]:
     return [random.randint(0, 1) for _ in range(size)]
   
-  def encrypt(self, plain_text: str) -> str:
+  def encrypt(self, plain_text: str, toHex: bool = False) -> str:
     result = bits_to_string(self.c_val)
     for block in super().execute_per_block(plain_text):
       self.c_val = string_to_bits(
@@ -71,9 +73,11 @@ class CBC(OperationMode):
       )
       result += bits_to_string(self.c_val)
 
-    return result
+    return string_to_hex(result) if toHex else result
   
-  def decrypt(self, cipher_text: str) -> str:
+  def decrypt(self, cipher_text: str, fromHex: bool = False) -> str:
+    cipher_text = hex_to_string(cipher_text) if (fromHex) else cipher_text
+
     result = ""
     first = True
     for block in super().execute_per_block(cipher_text):
@@ -105,7 +109,7 @@ class Counter(OperationMode):
     num = (num + 1) % (2**BLOCK_SIZE - 1)
     return [int(bit) for bit in f'{self.format}'.format(num)]
   
-  def encrypt(self, plain_text: str) -> str:
+  def encrypt(self, plain_text: str, toHex: bool = False) -> str:
     self.generate_counter(BLOCK_SIZE)
 
     result = ""
@@ -116,9 +120,10 @@ class Counter(OperationMode):
       result += bits_to_string([c_encrypted[i] ^ block[i] for i in range(BLOCK_SIZE)])
       self.counter = self.increment_counter(self.counter)
 
-    return result
+    return string_to_hex(result) if toHex else result
   
-  def decrypt(self, cipher_text: str) -> str:
+  def decrypt(self, cipher_text: str, fromHex: bool = False) -> str:
+    cipher_text = hex_to_string(cipher_text) if (fromHex) else cipher_text
     return self.encrypt(cipher_text)
 # endregion Counter Mode
 

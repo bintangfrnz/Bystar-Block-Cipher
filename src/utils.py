@@ -24,6 +24,13 @@ def bits_to_string(bit_rep: list[int]) -> str:
   )
 # endregion
 
+# region String <-> Hex
+def string_to_hex(text: str) -> str:
+  return text.encode().hex().upper()
+def hex_to_string(text: str) -> str:
+  return bytes.fromhex(text).decode()
+# endregion
+
 # region Int <-> Bit
 def format_int_to_bit(num: int) -> str:
   return bin(num).lstrip('0b').rjust(8, '0')
@@ -69,6 +76,16 @@ print(word)
 bits = string_to_bits(word)
 print(bits)
 word = bits_to_string(bits)
+print(word)
+'''
+
+# Testing string <-> hex
+'''
+word = "test"
+print(word)
+hex_str = string_to_hex(word)
+print(hex_str)
+word = hex_to_string(hex_str)
 print(word)
 '''
 
