@@ -1,0 +1,52 @@
+Plain text location: test/small_256.txt
+
+Mode: ECB
+  - Encryption time: 0.01147913932800293 second
+  - Decryption time: 0.01153111457824707 second
+Mode: CBC
+  - Encryption time: 0.012173891067504883 second
+  - Decryption time: 0.012007951736450195 second
+Mode: Counter
+  - Encryption time: 0.012454986572265625 second
+  - Decryption time: 0.012486934661865234 second
+
+----------
+Plain text location: test/very_large_16384.txt
+
+Mode: ECB
+  - Encryption time: 0.7234311103820801 second
+  - Decryption time: 0.7179620265960693 second
+Mode: CBC
+  - Encryption time: 0.765045166015625 second
+  - Decryption time: 0.7669219970703125 second
+Mode: Counter
+  - Encryption time: 0.7928087711334229 second
+  - Decryption time: 0.7913060188293457 second
+
+----------
+Plain text location: test/large_4096.txt
+
+Mode: ECB
+  - Encryption time: 0.18338894844055176 second
+  - Decryption time: 0.18311285972595215 second
+Mode: CBC
+  - Encryption time: 0.19421100616455078 second
+  - Decryption time: 0.19538116455078125 second
+Mode: Counter
+  - Encryption time: 0.20309805870056152 second
+  - Decryption time: 0.20160412788391113 second
+
+----------
+Plain text location: test/medium_1024.txt
+
+Mode: ECB
+  - Encryption time: 0.04606795310974121 second
+  - Decryption time: 0.04611778259277344 second
+Mode: CBC
+  - Encryption time: 0.0487971305847168 second
+  - Decryption time: 0.0489809513092041 second
+Mode: Counter
+  - Encryption time: 0.050614118576049805 second
+  - Decryption time: 0.05069422721862793 second
+
+----------
