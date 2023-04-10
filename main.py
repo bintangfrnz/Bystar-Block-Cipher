@@ -4,7 +4,6 @@
 # March 5, 2023
 
 import time
-from difflib import SequenceMatcher
 from enum import Enum
 
 from src.constant import *

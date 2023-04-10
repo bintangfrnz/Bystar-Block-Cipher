@@ -7,7 +7,7 @@ import random
 from abc import ABC, abstractmethod
 
 from .bystar import Bystar
-from .constant import BLOCK_SIZE, KEY, PLAIN_TEXT
+from .constant import *
 from .utils import string_to_bits, bits_to_string, string_to_hex, hex_to_string
 # remove dot to run this file
 
